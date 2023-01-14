@@ -1,0 +1,9 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "eligibility_criteria_parser"
+  site-url: "https://Mikołaj Morzy.github.io/eligibility_criteria_parser"
+  description: "Repository with experiments on the usability of prompt learning for parsing eligibility criteria in clinical trials"
+  repo-branch: main
+  repo-url: "https://github.com/Mikołaj Morzy/eligibility_criteria_parser"
