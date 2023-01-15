@@ -8,7 +8,7 @@ eligibility_criteria_parser
 In order to install the module issue the following command
 
 ``` sh
-bash$ git clone 
+bash$ git clone https://github.com/megaduks/criteria_parser.git
 
 bash$ cd criteria_parser
 
