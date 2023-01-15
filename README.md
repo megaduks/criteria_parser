@@ -5,7 +5,7 @@ eligibility_criteria_parser
 
 ## Install
 
-In order to install the module issue the following command
+In order to install the module issue the following commands
 
 ``` sh
 bash$ git clone https://github.com/megaduks/criteria_parser.git
@@ -15,11 +15,15 @@ bash$ cd criteria_parser
 bash$ pip install -e '.[dev]'
 ```
 
+As of now, unpack the dataset archive file into `./data/` directory.
+
 ## How to use
 
 Here is how you can load the Chia dataset for easy processing
 
 ``` python
+from eligibility_criteria_parser.core import *
+
 df = load_eligibility_criteria()
 ```
 
@@ -138,3 +142,12 @@ df.head()
   </tbody>
 </table>
 </div>
+
+``` python
+df.columns
+```
+
+    Index(['ct_no', 'criteria', 'mode', 'drugs', 'persons', 'procedures',
+           'conditions', 'devices', 'visits', 'scopes', 'observations',
+           'measurements'],
+          dtype='object')
