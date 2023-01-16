@@ -12,10 +12,16 @@ bash$ git clone https://github.com/megaduks/criteria_parser.git
 
 bash$ cd criteria_parser
 
+bash$ pip install -r requirements.txt
+
 bash$ pip install -e '.[dev]'
 ```
 
-As of now, unpack the dataset archive file into `./data/` directory.
+The next step is to run `dvc` to download the data
+
+``` bash
+bash$ dvc pull
+```
 
 ## How to use
 
@@ -151,3 +157,9 @@ df.columns
            'conditions', 'devices', 'visits', 'scopes', 'observations',
            'measurements'],
           dtype='object')
+
+``` python
+df.shape
+```
+
+    (2000, 12)
