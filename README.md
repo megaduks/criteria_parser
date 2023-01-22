@@ -163,3 +163,37 @@ df.shape
 ```
 
     (2000, 12)
+
+A simple function can compute the metric of entity coverage
+
+------------------------------------------------------------------------
+
+<a
+href="https://github.com/Mikołaj%20Morzy/eligibility_criteria_parser/blob/main/eligibility_criteria_parser/core.py#LNone"
+target="_blank" style="float:right; font-size:smaller">source</a>
+
+### entity_coverage
+
+>      entity_coverage (ents_true:List[str], ents_pred:List[str],
+>                       symmetric:bool=True)
+
+Compute the compound metric of entity coverage in eligibility criteria
+
+Args: ents_true: list of entities from Chia annotations ents_pred: list
+of entities returned from LM symmetric: if True, the Jaccard denominator
+is the union of sets of entities, otherwise only true entities are
+counted in the denominator
+
+For each entity in a criterion, find the predicted entity which
+maximizes the Jaccard score and return the average Jaccard score for
+matched entities and the percentage of entites for which any matching
+has been found
+
+``` python
+ents_true = ['adult', 'no alcohol substance abuse', 'cardiovascular disease', 'elevated cholesterol']
+ents_pred = ['adult man or woman', 'no alcohol usage during last year', 'high blood pressure']
+
+entity_coverage(ents_true=ents_true, ents_pred=ents_pred)
+```
+
+    (0.25, 0.5)
