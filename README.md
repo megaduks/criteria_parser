@@ -174,15 +174,18 @@ target="_blank" style="float:right; font-size:smaller">source</a>
 
 ### entity_coverage
 
->      entity_coverage (ents_true:List[str], ents_pred:List[str],
->                       symmetric:bool=True)
+>      entity_coverage (ents_true:List[str], ents_pred:List[str], mode:str,
+>                       threshold:float=0.0)
 
 Compute the compound metric of entity coverage in eligibility criteria
 
-Args: ents_true: list of entities from Chia annotations ents_pred: list
-of entities returned from LM symmetric: if True, the Jaccard denominator
-is the union of sets of entities, otherwise only true entities are
-counted in the denominator
+Args:
+
+    ents_true: entities from Chia annotations
+
+    ents_pred: predicted entities
+
+    mode: which version of Jaccard coefficient to use
 
 For each entity in a criterion, find the predicted entity which
 maximizes the Jaccard score and return the average Jaccard score for
@@ -192,8 +195,28 @@ has been found
 ``` python
 ents_true = ['adult', 'no alcohol substance abuse', 'cardiovascular disease', 'elevated cholesterol']
 ents_pred = ['adult man or woman', 'no alcohol usage during last year', 'high blood pressure']
+```
 
-entity_coverage(ents_true=ents_true, ents_pred=ents_pred)
+``` python
+entity_coverage(ents_true=ents_true, ents_pred=ents_pred, mode="strict")
 ```
 
     (0.25, 0.5)
+
+``` python
+entity_coverage(ents_true=ents_true, ents_pred=ents_pred, mode="relaxed")
+```
+
+    (0.75, 0.5)
+
+``` python
+entity_coverage(ents_true=ents_true, ents_pred=ents_pred, mode="left")
+```
+
+    (0.75, 0.5)
+
+``` python
+entity_coverage(ents_true=ents_true, ents_pred=ents_pred, mode="right")
+```
+
+    (0.29166666666666663, 0.5)
