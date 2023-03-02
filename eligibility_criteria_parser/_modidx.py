@@ -14,4 +14,6 @@ d = { 'settings': { 'branch': 'main',
                                                   'eligibility_criteria_parser.core.jaccard_score': ( 'core.html#jaccard_score',
                                                                                                       'eligibility_criteria_parser/core.py'),
                                                   'eligibility_criteria_parser.core.load_eligibility_criteria': ( 'core.html#load_eligibility_criteria',
-                                                                                                                  'eligibility_criteria_parser/core.py')}}}
+                                                                                                                  'eligibility_criteria_parser/core.py'),
+                                                  'eligibility_criteria_parser.core.prompt_predict': ( 'core.html#prompt_predict',
+                                                                                                       'eligibility_criteria_parser/core.py')}}}
