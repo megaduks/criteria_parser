@@ -180,7 +180,7 @@ def prompt_predict(
 
     predictions = [
         " ".join(biogpt_prompt_ner(prompt_fun(criterion, examples, entity, n_shots), entity))
-        for criterion, entities in criteria
+        for criterion, entities in examples
     ]
 
 #     for mode in modes:
