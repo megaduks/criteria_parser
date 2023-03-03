@@ -191,7 +191,7 @@ def prompt_score(ents_true: List[str], ents_pred: List[str]) -> Dict:
 
 # %% ../nbs/00_core.ipynb 17
 def fit_prompt(
-    examples: List[Tuple[str,str]],
+    examples: List[Tuple[int, str,str]],
     entity: str,
     model: object,
     prompt_fun: Callable,
@@ -200,7 +200,7 @@ def fit_prompt(
 ) -> List[List[str]]:
     """Applies prompting to all input examples and returns predicted entities"""
 
-    criteria, ents_true = zip(*examples)
+    ids, criteria, ents_true = zip(*examples)
 
     ents_pred = [
         deprompt_fun(biogpt_prompt_ner(prompt_fun(criterion, examples, entity, n_shots), entity, m), entity)
