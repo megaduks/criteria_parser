@@ -11,6 +11,7 @@ import statistics
 
 from pathlib import Path
 from typing import List, Tuple, Callable, Dict
+from tqdm.notebook import tqdm
 
 # %% ../nbs/00_core.ipynb 5
 def load_chia() -> pd.DataFrame:
