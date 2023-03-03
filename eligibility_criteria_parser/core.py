@@ -192,7 +192,7 @@ def prompt_score(ents_true: List[str], ents_pred: List[str]) -> Dict:
 
 # %% ../nbs/00_core.ipynb 17
 def fit_prompt(
-    examples: List[Tuple[int, str,str]],
+    examples: List[Tuple[int, str, str]],
     entity: str,
     model: object,
     prompt_fun: Callable,
@@ -204,8 +204,13 @@ def fit_prompt(
     ids, criteria, ents_true = zip(*examples)
 
     ents_pred = [
-        deprompt_fun(biogpt_prompt_ner(prompt_fun(criterion, examples, entity, n_shots), entity, m), entity)
+        deprompt_fun(
+            biogpt_prompt_ner(
+                prompt_fun(criterion, examples, entity, n_shots), entity, model
+            ),
+            entity,
+        )
         for criterion in tqdm(criteria)
     ]
-    
+
     return ents_pred
