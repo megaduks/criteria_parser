@@ -174,20 +174,23 @@ def biogpt_prompt_ner(prompt: str, entity: str, model: object) -> List[str]:
 # %% ../nbs/00_core.ipynb 16
 def prompt_score(ents_true: List[str], ents_pred: List[str]) -> Dict:
     """Computes aggregates (means and standard deviations) of all types of Jaccard coeff scores"""
-    
+
     result = {}
     modes = ["strict", "relaxed", "left", "right"]
-    
+
     for mode in modes:
-        _lst = [entity_coverage(e_true, e_pred, mode=mode) for e_true, e_pred in zip(ents_true, ents_pred)]
+        _lst = [
+            entity_coverage_score(e_true, e_pred, mode=mode)
+            for e_true, e_pred in zip(ents_true, ents_pred)
+        ]
         jaccard_scores, pct_scores = zip(*_lst)
         result[mode] = (
             statistics.mean(jaccard_scores),
             statistics.stdev(jaccard_scores),
             statistics.mean(pct_scores),
-            statistics.stdev(pct_scores)
+            statistics.stdev(pct_scores),
         )
-        
+
     return result
 
 # %% ../nbs/00_core.ipynb 17
