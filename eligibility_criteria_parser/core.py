@@ -158,7 +158,7 @@ def get_annotations(
 
     return result
 
-# %% ../nbs/00_core.ipynb 15
+# %% ../nbs/00_core.ipynb 14
 def biogpt_prompt_ner(prompt: str, entity: str, model: object) -> List[str]:
     """Applies the model to a prompt"""
     try:
@@ -171,9 +171,23 @@ def biogpt_prompt_ner(prompt: str, entity: str, model: object) -> List[str]:
     except:
         return []
 
-# %% ../nbs/00_core.ipynb 16
-def prompt_score(ents_true: List[str], ents_pred: List[str]) -> Dict:
-    """Computes aggregates (means and standard deviations) of all types of Jaccard coeff scores"""
+# %% ../nbs/00_core.ipynb 15
+def prompt_score(ents_true: List[List[str]], ents_pred: List[List[str]]) -> Dict:
+    """Computes aggregates (means and standard deviations) of all types of Jaccard coeff scores
+    
+    Args:
+        ents_true: list of true entity annotations for a criterion
+        ents_pred: list of entity annotations predicted by the model
+        
+    Returns:
+        dictionary with keys 'strict', 'relaxed', 'left', 'right' representing
+        Jaccard coefficient matching modes, each entry is a tuple with the 
+        following metrics:
+        - mean jaccard score of entity matches
+        - standard deviation of jaccard scores of entity matches
+        - mean percentage coverage of entities
+        - standard deviation of percentage coverages
+    """
 
     result = {}
     modes = ["strict", "relaxed", "left", "right"]
@@ -193,7 +207,7 @@ def prompt_score(ents_true: List[str], ents_pred: List[str]) -> Dict:
 
     return result
 
-# %% ../nbs/00_core.ipynb 17
+# %% ../nbs/00_core.ipynb 16
 def fit_prompt(
     examples: List[Tuple[int, str, str]],
     entity: str,
