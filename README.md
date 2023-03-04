@@ -25,12 +25,12 @@ bash$ dvc pull
 
 ## How to use
 
-Here is how you can load the Chia dataset for easy processing
+The function `load_chia()` downloads the entire dataset as a dataframe
 
 ``` python
 from eligibility_criteria_parser.core import *
 
-df = load_eligibility_criteria()
+df = load_chia()
 ```
 
 ``` python
@@ -149,14 +149,8 @@ df.head()
 </table>
 </div>
 
-``` python
-df.columns
-```
-
-    Index(['ct_no', 'criteria', 'mode', 'drugs', 'persons', 'procedures',
-           'conditions', 'devices', 'visits', 'scopes', 'observations',
-           'measurements'],
-          dtype='object')
+The dataset consists of 2000 clinical trial criteria annotated with 10
+different entities
 
 ``` python
 df.shape
@@ -164,59 +158,173 @@ df.shape
 
     (2000, 12)
 
-A simple function can compute the metric of entity coverage
+To extract a particular entity use `get_annotations()` function. This
+function accepts the name of the annotated entity, the number of
+examples to be downloaded, and the flag to allow for random/ordered
+retrieval of examples.
 
-------------------------------------------------------------------------
-
-<a
-href="https://github.com/Mikołaj%20Morzy/eligibility_criteria_parser/blob/main/eligibility_criteria_parser/core.py#LNone"
-target="_blank" style="float:right; font-size:smaller">source</a>
-
-### entity_coverage
-
->      entity_coverage (ents_true:List[str], ents_pred:List[str], mode:str,
->                       threshold:float=0.0)
-
-Compute the compound metric of entity coverage in eligibility criteria
-
-Args:
-
-    ents_true: entities from Chia annotations
-
-    ents_pred: predicted entities
-
-    mode: which version of Jaccard coefficient to use
-
-For each entity in a criterion, find the predicted entity which
-maximizes the Jaccard score and return the average Jaccard score for
-matched entities and the percentage of entites for which any matching
-has been found
+The result is a list of tuples, each tuple contains the clinical trial
+ID, the text of the criterion, and the annotated entities.
 
 ``` python
-ents_true = ['adult', 'no alcohol substance abuse', 'cardiovascular disease', 'elevated cholesterol']
-ents_pred = ['adult man or woman', 'no alcohol usage during last year', 'high blood pressure']
+examples = get_annotations("drugs", n=5, random=False)
+examples
 ```
+
+    [('NCT03216967',
+      'Adult patients Kidney transplant recipients Patients treated by a calcineurin inhibitor and mycophenolic acid Viremia >= 3 log UI/ml Patients who have given written informed consent Negative pregnancy test (blood ß-HCG dosage)',
+      ['calcineurin inhibitor', 'mycophenolic acid']),
+     ('NCT00730301',
+      'Patient diagnosed by HRCT Core Lab with eligible heterogeneous disease distribution and at least one complete oblique fissure.  Age from 40 to 75 years  BMI < 32 kg/m2  FEV1 < 40% of predicted value, FEV1/FVC < 70%  TLC > 120% predicted, RV > 150% predicted.  Stable with < 20 mg prednisone (or equivalent) qd  PaCO2 < 50mm Hg  PaO2 > 45 mm Hg on room air  6-min walk of > 50m (without rehabilitation) or > 100m (with rehabilitation)  Nonsmoking for 4 months prior to initial interview and throughout screening  The patient agrees to all protocol required follow-up intervals.  The patient has no child bearing potential  The patient is willing and able to complete protocol required baseline assessments and procedures ',
+      ['prednisone']),
+     ('NCT02715466',
+      'Male or female patients = 18 and = 85 years of age Women of child bearing potential must test negative on standard pregnancy test (urine or serum) Patients with body weight = 55 kg and = 140 kg and body mass index (BMI) = 18 kg/m2 Patients diagnosed severe sepsis / septic shock at admission on Intensive Care Unit who can be enrolled within 90 min after admission OR patients diagnosed severe sepsis / septic shock during Intensive Care Unit stay who can be enrolled within 90 min after diagnosis Patients where antibiotic therapy has already been started (prior to randomization) Patient who are fluid responsive. Fluid responsiveness is defined as increase of > 10% in mean arterial pressure (MAP) after passive leg raising (PLR) Signed informed consent by patient, legal representative or authorized person or deferred consent',
+      ['antibiotic therapy']),
+     ('NCT02735902',
+      'The patient or his/her representative must have given free and informed consent and signed the consent The patient must be insured or beneficiary of a health insurance plan The patient is available for 12 months of follow-up The patient underwent a successful transcutaneous implant procedure for an aortic valve within the past 24 hours The patient was receiving anti-vitamin K (AVK) treatment before percutaneous implantation of the aortic valve',
+      ['anti-vitamin K', 'AVK']),
+     ('NCT00989261',
+      '1. Males and females age ≥18 years in second relapse or refractory.  2. Males and females age ≥60 years in first relapse or refractory.  3. Must have baseline bone marrow sample taken.  4. Morphologically documented primary AML or AML secondary to myelodysplastic syndrome (MDS with ≥20% bone marrow or peripheral blasts), as defined by the World Health Organization (WHO) criteria, confirmed by pathology review at treating institution.  5. Able to swallow the liquid study drug.  6. ECOG performance status of 0 to 2  7. In the absence of rapidly progressing disease, the interval from prior treatment to time of AC220 administration will be at least 2 weeks for cytotoxic agents or at least 5 half-lives for noncytotoxic agents. The use of chemotherapeutic or antileukemic agents other than hydroxyurea is not permitted during the study with the possible exception of intrathecal (IT) therapy at the discretion of the Investigator and with the agreement of the Sponsor.  8. Persistent chronic clinically significant non-hematological toxicities from prior treatment must be ≤Grade 1.  9. Prior therapy with FLT3 inhibitors is permitted, except previous treatment with AC220.  10. Serum creatinine ≤1.5 × ULN and glomerular filtration rate (GFR) > 30 mL/min  11. Serum potassium, magnesium, and calcium levels should be at least within institutional normal limits.  12. Total serum bilirubin ≤1.5 × ULN  13. Serum aspartate transaminase (AST) and/or alanine transaminase (ALT) ≤2.5 × ULN  14. Females of childbearing potential must have a negative pregnancy test (urine β-hCG).  15. Females of childbearing potential and sexually mature males must agree to use a medically accepted method of contraception throughout the study.  16. Written informed consent must be provided. ',
+      ['FLT3 inhibitors', 'AC220'])]
+
+In order to use this data for prompting, the IDs, criteria, and
+annotations have to be separated into lists.
 
 ``` python
-entity_coverage(ents_true=ents_true, ents_pred=ents_pred, mode="strict")
+ids, criteria, ents_true = map(list, zip(*examples))
+
+print(ids[:3])
+print(criteria[:3])
+print(ents_true[:3])
 ```
 
-    (0.25, 0.5)
+    ['NCT03216967', 'NCT00730301', 'NCT02715466']
+    ['Adult patients Kidney transplant recipients Patients treated by a calcineurin inhibitor and mycophenolic acid Viremia >= 3 log UI/ml Patients who have given written informed consent Negative pregnancy test (blood ß-HCG dosage)', 'Patient diagnosed by HRCT Core Lab with eligible heterogeneous disease distribution and at least one complete oblique fissure.  Age from 40 to 75 years  BMI < 32 kg/m2  FEV1 < 40% of predicted value, FEV1/FVC < 70%  TLC > 120% predicted, RV > 150% predicted.  Stable with < 20 mg prednisone (or equivalent) qd  PaCO2 < 50mm Hg  PaO2 > 45 mm Hg on room air  6-min walk of > 50m (without rehabilitation) or > 100m (with rehabilitation)  Nonsmoking for 4 months prior to initial interview and throughout screening  The patient agrees to all protocol required follow-up intervals.  The patient has no child bearing potential  The patient is willing and able to complete protocol required baseline assessments and procedures ', 'Male or female patients = 18 and = 85 years of age Women of child bearing potential must test negative on standard pregnancy test (urine or serum) Patients with body weight = 55 kg and = 140 kg and body mass index (BMI) = 18 kg/m2 Patients diagnosed severe sepsis / septic shock at admission on Intensive Care Unit who can be enrolled within 90 min after admission OR patients diagnosed severe sepsis / septic shock during Intensive Care Unit stay who can be enrolled within 90 min after diagnosis Patients where antibiotic therapy has already been started (prior to randomization) Patient who are fluid responsive. Fluid responsiveness is defined as increase of > 10% in mean arterial pressure (MAP) after passive leg raising (PLR) Signed informed consent by patient, legal representative or authorized person or deferred consent']
+    [['calcineurin inhibitor', 'mycophenolic acid'], ['prednisone'], ['antibiotic therapy']]
+
+The last step is to prepare two utility functions: - prompting function:
+creates a prompt for a given example - deprompting function: reads the
+answer from the language model and extracts predicted entities
+
+Below is an example of a simple prompting function. This function
+constructs a specific template with `n_shots` examples and attaches the
+`criterion` for which the language model has to generate the response
 
 ``` python
-entity_coverage(ents_true=ents_true, ents_pred=ents_pred, mode="relaxed")
+from typing import List, Tuple
+
+def simple_prompt(criterion: str, examples: List[Tuple[id, str,str]], entity: str, n_shots: int) -> str:
+    
+    TEXT = ""
+    for ids, c, e in examples[:n_shots]:
+        TEXT += f"""[text]: {c} \n###\n[{entity}]: {e} \n###\n"""
+    
+    return f"""{TEXT}[text]: {criterion} \n###\n[{entity}]:"""
 ```
 
-    (0.75, 0.5)
+As can be seen from the signature, the function accepts the following
+input: - `criterion`: the input example - `examples`: list of tuples
+(clinical trial id, criterion, true entities) that can be used to
+generate a few shot examples - `entity`: the name of the entity -
+`num_shots`: number of examples to be included in the prompt
+
+The `examples` input has exactly the same structure as the output of the
+`get_annotations()` function.
+
+Let’s test the prompt generated by the function
 
 ``` python
-entity_coverage(ents_true=ents_true, ents_pred=ents_pred, mode="left")
+ct_id, criterion, e_true = examples[-1]
+
+print(f"criterion: {criterion} \n\n annotated drugs: {e_true}")
 ```
 
-    (0.75, 0.5)
+    criterion: 1. Males and females age ≥18 years in second relapse or refractory.  2. Males and females age ≥60 years in first relapse or refractory.  3. Must have baseline bone marrow sample taken.  4. Morphologically documented primary AML or AML secondary to myelodysplastic syndrome (MDS with ≥20% bone marrow or peripheral blasts), as defined by the World Health Organization (WHO) criteria, confirmed by pathology review at treating institution.  5. Able to swallow the liquid study drug.  6. ECOG performance status of 0 to 2  7. In the absence of rapidly progressing disease, the interval from prior treatment to time of AC220 administration will be at least 2 weeks for cytotoxic agents or at least 5 half-lives for noncytotoxic agents. The use of chemotherapeutic or antileukemic agents other than hydroxyurea is not permitted during the study with the possible exception of intrathecal (IT) therapy at the discretion of the Investigator and with the agreement of the Sponsor.  8. Persistent chronic clinically significant non-hematological toxicities from prior treatment must be ≤Grade 1.  9. Prior therapy with FLT3 inhibitors is permitted, except previous treatment with AC220.  10. Serum creatinine ≤1.5 × ULN and glomerular filtration rate (GFR) > 30 mL/min  11. Serum potassium, magnesium, and calcium levels should be at least within institutional normal limits.  12. Total serum bilirubin ≤1.5 × ULN  13. Serum aspartate transaminase (AST) and/or alanine transaminase (ALT) ≤2.5 × ULN  14. Females of childbearing potential must have a negative pregnancy test (urine β-hCG).  15. Females of childbearing potential and sexually mature males must agree to use a medically accepted method of contraception throughout the study.  16. Written informed consent must be provided.  
+
+     annotated drugs: ['FLT3 inhibitors', 'AC220']
 
 ``` python
-entity_coverage(ents_true=ents_true, ents_pred=ents_pred, mode="right")
+prompt = simple_prompt(criterion=criterion, examples=examples, entity="drugs", n_shots=3)
+
+print(prompt)
 ```
 
-    (0.29166666666666663, 0.5)
+    [text]: Adult patients Kidney transplant recipients Patients treated by a calcineurin inhibitor and mycophenolic acid Viremia >= 3 log UI/ml Patients who have given written informed consent Negative pregnancy test (blood ß-HCG dosage) 
+    ###
+    [drugs]: ['calcineurin inhibitor', 'mycophenolic acid'] 
+    ###
+    [text]: Patient diagnosed by HRCT Core Lab with eligible heterogeneous disease distribution and at least one complete oblique fissure.  Age from 40 to 75 years  BMI < 32 kg/m2  FEV1 < 40% of predicted value, FEV1/FVC < 70%  TLC > 120% predicted, RV > 150% predicted.  Stable with < 20 mg prednisone (or equivalent) qd  PaCO2 < 50mm Hg  PaO2 > 45 mm Hg on room air  6-min walk of > 50m (without rehabilitation) or > 100m (with rehabilitation)  Nonsmoking for 4 months prior to initial interview and throughout screening  The patient agrees to all protocol required follow-up intervals.  The patient has no child bearing potential  The patient is willing and able to complete protocol required baseline assessments and procedures  
+    ###
+    [drugs]: ['prednisone'] 
+    ###
+    [text]: Male or female patients = 18 and = 85 years of age Women of child bearing potential must test negative on standard pregnancy test (urine or serum) Patients with body weight = 55 kg and = 140 kg and body mass index (BMI) = 18 kg/m2 Patients diagnosed severe sepsis / septic shock at admission on Intensive Care Unit who can be enrolled within 90 min after admission OR patients diagnosed severe sepsis / septic shock during Intensive Care Unit stay who can be enrolled within 90 min after diagnosis Patients where antibiotic therapy has already been started (prior to randomization) Patient who are fluid responsive. Fluid responsiveness is defined as increase of > 10% in mean arterial pressure (MAP) after passive leg raising (PLR) Signed informed consent by patient, legal representative or authorized person or deferred consent 
+    ###
+    [drugs]: ['antibiotic therapy'] 
+    ###
+    [text]: 1. Males and females age ≥18 years in second relapse or refractory.  2. Males and females age ≥60 years in first relapse or refractory.  3. Must have baseline bone marrow sample taken.  4. Morphologically documented primary AML or AML secondary to myelodysplastic syndrome (MDS with ≥20% bone marrow or peripheral blasts), as defined by the World Health Organization (WHO) criteria, confirmed by pathology review at treating institution.  5. Able to swallow the liquid study drug.  6. ECOG performance status of 0 to 2  7. In the absence of rapidly progressing disease, the interval from prior treatment to time of AC220 administration will be at least 2 weeks for cytotoxic agents or at least 5 half-lives for noncytotoxic agents. The use of chemotherapeutic or antileukemic agents other than hydroxyurea is not permitted during the study with the possible exception of intrathecal (IT) therapy at the discretion of the Investigator and with the agreement of the Sponsor.  8. Persistent chronic clinically significant non-hematological toxicities from prior treatment must be ≤Grade 1.  9. Prior therapy with FLT3 inhibitors is permitted, except previous treatment with AC220.  10. Serum creatinine ≤1.5 × ULN and glomerular filtration rate (GFR) > 30 mL/min  11. Serum potassium, magnesium, and calcium levels should be at least within institutional normal limits.  12. Total serum bilirubin ≤1.5 × ULN  13. Serum aspartate transaminase (AST) and/or alanine transaminase (ALT) ≤2.5 × ULN  14. Females of childbearing potential must have a negative pregnancy test (urine β-hCG).  15. Females of childbearing potential and sexually mature males must agree to use a medically accepted method of contraception throughout the study.  16. Written informed consent must be provided.  
+    ###
+    [drugs]:
+
+Similarly, a deprompting function has to be created to parse the answer
+from the language model and extract only the part relevant to the
+predicted entities. Below is an example of a simple deprompting
+function. The output of the language model **does not contain the input
+prompt**. The function simply removes all punctuation and all mentions
+of the entity name, and returns a list of unique terms generated by the
+language model.
+
+``` python
+def simple_deprompt(model_output: str, entity: str) -> List[str]:
+    return list(
+        set(
+            model_output.translate(str.maketrans("", "", string.punctuation))
+            .replace(f"{entity}", "")
+            .split()
+        )
+    )
+```
+
+The prediction is performed by the
+[`fit_prompt`](https://Mikołaj%20Morzy.github.io/eligibility_criteria_parser/core.html#fit_prompt)
+function which expects the following parameters: - `examples`: list of
+examples for which to perform prompting - `entity`: name of the entity -
+`model`: an object representing the BioGPT model - `prompt_fun`: a
+handle to the prompting funciton - `deprompt_fun`: a handle to the
+deprompting function
+
+Assuming we have correctly initialized the BioGPT model under the
+`model` variable, the invocation of the function is:
+
+``` python
+# from fairseq.models.transformer_lm import TransformerLanguageModel
+
+# model = TransformerLanguageModel.from_pretrained(
+#     "biogpt/checkpoints/Pre-trained-BioGPT", 
+#     "checkpoint.pt", 
+#     "biogpt/BioGPT/data",
+#     tokenizer='moses', 
+#     bpe='fastbpe', 
+#     bpe_codes="biogpt/BioGPT/data/bpecodes",
+#     min_len=100,
+#     max_len_b=2048,
+#     cuda=True,
+#     verbose=False,
+# )
+
+model = None # here the model should be initialized as commented out
+
+ents_pred = fit_prompt(examples, "drugs", model, simple_prompt, simple_deprompt)
+```
+
+Finally, the results can be computed using a single function
+`prompt_score()` which accepts two lists: true entities and the entities
+predicted from the language model. Both arguments are lists of lists of
+strings. The true entities are returned from the `get_annotations()`
+function, and the predicted entities are the results of the
+`fit_prompt()` function.
+
+The results of the function is a dictionary with keys representing each
+mode of Jaccard coefficient (*strict, left, right, relaxed*), each value
+is a tuple with four numbers: - mean jaccard score of entity matches -
+standard deviation of jaccard scores of entity matches - mean percentage
+coverage of entities - standard deviation of percentage coverages
