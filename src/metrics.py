@@ -8,6 +8,14 @@ def jaccard_score(a: Set, b: Set, mode: str = "strict") -> float:
     relaxed: |a & b| / min{|a|,|b|}
     left: |a & b| / |a|
     right: |a & b| / |b|
+
+    Args:
+        a (Set): Set a
+        b (Set): Set b
+        mode (str, optional): Mode. Defaults to "strict".
+
+    Returns:
+        float: Jaccard score
     """
 
     if (not a) or (not b):
