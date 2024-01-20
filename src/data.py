@@ -3,6 +3,9 @@ from pathlib import Path
 from typing import List
 
 
+DATA_DIR = Path("../data")
+
+
 def get_entities(clinical_trail_no: str, mode: str, entity_name: str) -> List:
     """Read annotations from .ann file and return a list of entities of type e
 
@@ -17,7 +20,7 @@ def get_entities(clinical_trail_no: str, mode: str, entity_name: str) -> List:
 
     entities = []
 
-    with open(f"data/{clinical_trail_no}{mode}.ann", "rt") as f:
+    with open(f"{DATA_DIR}/{clinical_trail_no}{mode}.ann", "rt") as f:
         data = f.read().splitlines()
 
     for row in data:
@@ -50,7 +53,7 @@ def load_chia() -> pd.DataFrame:
 
     for mode in ["_inc", "_exc"]:
 
-        criteria_files = Path("data").glob(f"*{mode}.txt")
+        criteria_files = DATA_DIR.glob(f"*{mode}.txt")
 
         for f in criteria_files:
             clinical_trial_no = str(f).lstrip("data/").rstrip(f"{mode}.txt")
