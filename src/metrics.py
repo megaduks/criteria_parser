@@ -37,7 +37,9 @@ def entity_coverage_score(
         ents_pred: List[str],
         jaccard_mode: str = "strict",
 ) -> float:
-    """Computes the entity coverage score for a given mode
+    """Computes the entity coverage score for a given mode. Given a list of true entities and the list of
+    predicted entities, the entity coverage score is the average Jaccard score of the predicted entities when
+    each predicted entity is matched against the highest matching expected entity.
 
     Args:
         ents_true (List[str]): List of entities in the ground truth
@@ -47,6 +49,10 @@ def entity_coverage_score(
     Returns:
         float: Average Jaccaard score of predicted entities
     """
+
+    # raise TypeError when arguments are not lists
+    if not (isinstance(ents_true, list) and isinstance(ents_pred, list)):
+        raise TypeError("Entities must be a list")
 
     if not ents_true:
         return 0.

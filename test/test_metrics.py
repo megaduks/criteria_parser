@@ -109,6 +109,16 @@ class MetricsTestCase(unittest.TestCase):
             entity_coverage_score(["a b c d", "e f g h", "i j k", "l m n"], ["a b"]), 0.125
         )
 
+    def test_entity_coverage_score_left_argument_is_not_a_list(self):
+        """Tests if entity_coverage_score raises TypeError when left argument is not a list"""
+        with self.assertRaises(TypeError):
+            entity_coverage_score("a b c d", ["a b"])
+
+    def test_entity_coverage_score_right_argument_is_not_a_list(self):
+        """Tests if entity_coverage_score raises TypeError when right argument is not a list"""
+        with self.assertRaises(TypeError):
+            entity_coverage_score(["a b c d"], "a b")
+
 
 if __name__ == "__main__":
     unittest.main()
