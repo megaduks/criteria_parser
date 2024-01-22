@@ -1,7 +1,7 @@
 import unittest
 import pandas as pd
 
-from src.data import load_chia, load_fb, train_test_dev_split
+from src.data import load_chia, load_fb, train_test_dev_split, get_chia_annotations
 
 
 class DataTestCase(unittest.TestCase):
@@ -55,6 +55,20 @@ class DataTestCase(unittest.TestCase):
         self.assertEqual(splits["train"].shape[0], 1400)
         self.assertEqual(splits["test"].shape[0], 400)
         self.assertEqual(splits["dev"].shape[0], 200)
+
+    def test_get_chia_annotations_returns_list_of_tuples(self):
+        """Tests if get_chia_annotations returns a list of tuples"""
+        self.assertIsInstance(get_chia_annotations("drugs"), list)
+        self.assertIsInstance(get_chia_annotations("drugs")[0], tuple)
+
+    def test_get_chia_annotations_returns_limited_num_rows(self):
+        """Tests if get_chia_annotations returns a list of tuples of the correct length"""
+        self.assertEqual(len(get_chia_annotations("drugs", n=10)), 10)
+
+    def test_get_chia_annotations_raises_error_for_wrong_entity(self):
+        """Tests if get_chia_annotations raises ValueError for wrong entity"""
+        with self.assertRaises(AssertionError):
+            get_chia_annotations("wrong_entity")
 
 
 if __name__ == "__main__":

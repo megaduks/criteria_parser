@@ -1,10 +1,10 @@
 import pandas as pd
 import json
-from typing import List, Dict
+from typing import List, Dict, Tuple
 from settings import CHIA_PATH, FB_PATH
 
 
-def get_entities(clinical_trail_no: str, mode: str, entity_name: str) -> List:
+def get_chia_entities(clinical_trail_no: str, mode: str, entity_name: str) -> List:
     """Read annotations from .ann file and return a list of entities of type e
 
     Args:
@@ -26,6 +26,49 @@ def get_entities(clinical_trail_no: str, mode: str, entity_name: str) -> List:
             entities.append(" ".join(row.split()[4:]))
 
     return entities
+
+
+def get_chia_annotations(entity: str, n: int = None, random: bool = False) -> List[Tuple[int, str, str]]:
+    """Returns a list of tuples of the form (clinical_trial_no, criteria, entity) from the Chia dataset
+
+    Args:
+        entity (str): Entity type
+        n (int, optional): Number of records to return. Defaults to None.
+        random (bool, optional): Whether to return records randomly. Defaults to False.
+    Returns:
+        List[Tuple[int, str, str]]: List of tuples of the form (clinical_trial_no, criteria, entity)
+    """
+    ents = [
+        "drugs",
+        "persons",
+        "procedures",
+        "conditions",
+        "devices",
+        "visits",
+        "scopes",
+        "observations",
+        "measurements",
+        ]
+
+    assert entity in ents, f"Entity must be one of {ents}"
+
+    df = load_chia()
+
+    if random:
+        result = (
+            df[~df[entity].isna()][["ct_no", "criteria", entity]][:n]
+            .sample(frac=1.0)
+            .to_records(index=False)
+            .tolist()
+        )
+    else:
+        result = (
+            df[~df[entity].isna()][["ct_no", "criteria", entity]][:n]
+            .to_records(index=False)
+            .tolist()
+        )
+
+    return result
 
 
 def load_chia() -> pd.DataFrame:
@@ -65,7 +108,7 @@ def load_chia() -> pd.DataFrame:
             }
 
             for entity in ent_map:
-                ents = get_entities(clinical_trial_no, mode, ent_map[entity])
+                ents = get_chia_entities(clinical_trial_no, mode, ent_map[entity])
                 _rec[entity] = ents if ents else None
 
             _lst.append(_rec)
