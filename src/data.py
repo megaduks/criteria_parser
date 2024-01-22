@@ -1,4 +1,5 @@
 import pandas as pd
+import json
 from pathlib import Path
 from typing import List
 
@@ -71,3 +72,19 @@ def load_chia() -> pd.DataFrame:
             _lst.append(_rec)
 
     return pd.DataFrame(_lst)
+
+
+def load_fb() -> pd.DataFrame:
+    """Exports FB annotated dataset as a Pandas dataframe
+
+    Returns:
+        pd.DataFrame: FB annotated dataset as a Pandas dataframe
+    """
+    input_file = DATA_DIR / "fb_dset_preprocessed.json"
+
+    with open(input_file) as f:
+        _data = json.load(f)
+
+    df = pd.json_normalize(_data)
+
+    return df
