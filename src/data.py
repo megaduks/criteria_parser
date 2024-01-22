@@ -1,7 +1,7 @@
 import pandas as pd
 import json
 from pathlib import Path
-from typing import List
+from typing import List, Dict
 
 
 DATA_DIR = Path("../data")
@@ -88,3 +88,32 @@ def load_fb() -> pd.DataFrame:
     df = pd.json_normalize(_data)
 
     return df
+
+
+def train_test_dev_split(df: pd.DataFrame, random_seed=42, ratio=(70, 20, 10)) -> Dict:
+    """Splits the dataset into train, test and dev sets using the given ratios and random seed
+
+    Args:
+        df (pd.DataFrame): Input dataframe
+        random_seed (int, optional): Random seed. Defaults to 42.
+        ratio (tuple, optional): Train, test and dev ratios. Defaults to (70, 20, 10).
+
+    Returns:
+        Dict: Dictionary with train, test and dev sets
+    """
+
+    assert sum(ratio) == 100, "Sum of ratios must be 100"
+
+    df = df.sample(frac=1, random_state=random_seed).reset_index(drop=True)
+
+    train_ratio, test_ratio, dev_ratio = ratio
+
+    train_size = int(len(df) * train_ratio / 100)
+    test_size = int(len(df) * test_ratio / 100)
+    dev_size = int(len(df) * dev_ratio / 100)
+
+    train = df[:train_size]
+    test = df[train_size:train_size+test_size]
+    dev = df[train_size+test_size:]
+
+    return {"train": train, "test": test, "dev": dev}

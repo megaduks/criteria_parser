@@ -1,7 +1,7 @@
 import unittest
 import pandas as pd
 
-from src.data import load_chia, load_fb
+from src.data import load_chia, load_fb, train_test_dev_split
 
 
 class DataTestCase(unittest.TestCase):
@@ -33,6 +33,28 @@ class DataTestCase(unittest.TestCase):
     def test_fb_number_of_columns(self):
         """Tests if load_fb returns a dataframe with 17 columns"""
         self.assertEqual(self.df_fb.shape[1], 17)
+
+    def test_train_test_dev_split(self):
+        """Tests if train_test_dev_split returns a dictionary with 3 keys"""
+        self.assertEqual(len(train_test_dev_split(self.df_chia)), 3)
+
+    def test_train_test_dev_split_keys(self):
+        """Tests if train_test_dev_split returns a dictionary with train, test, and dev keys"""
+        self.assertIn("train", train_test_dev_split(self.df_chia))
+        self.assertIn("test", train_test_dev_split(self.df_chia))
+        self.assertIn("dev", train_test_dev_split(self.df_chia))
+
+    def test_train_test_dev_split_wrong_ratios(self):
+        """Tests if train_test_dev_split raises AssertionError when sum of ratios is not 100"""
+        with self.assertRaises(AssertionError):
+            train_test_dev_split(self.df_chia, ratio=(70, 20, 11))
+
+    def test_train_test_dev_split_sizes_of_splits(self):
+        """Tests if train_test_dev_split returns a dictionary with train, test, and dev splits of correct sizes"""
+        splits = train_test_dev_split(self.df_chia, ratio=(70, 20, 10))
+        self.assertEqual(splits["train"].shape[0], 1400)
+        self.assertEqual(splits["test"].shape[0], 400)
+        self.assertEqual(splits["dev"].shape[0], 200)
 
 
 if __name__ == "__main__":
