@@ -1,10 +1,7 @@
 import pandas as pd
 import json
-from pathlib import Path
 from typing import List, Dict
-
-
-DATA_DIR = Path("../data")
+from settings import CHIA_PATH, FB_PATH
 
 
 def get_entities(clinical_trail_no: str, mode: str, entity_name: str) -> List:
@@ -21,7 +18,7 @@ def get_entities(clinical_trail_no: str, mode: str, entity_name: str) -> List:
 
     entities = []
 
-    with open(f"{DATA_DIR}/{clinical_trail_no}{mode}.ann", "rt") as f:
+    with open(f"{CHIA_PATH}/{clinical_trail_no}{mode}.ann", "rt") as f:
         data = f.read().splitlines()
 
     for row in data:
@@ -53,17 +50,19 @@ def load_chia() -> pd.DataFrame:
     }
 
     for mode in ["_inc", "_exc"]:
-
-        criteria_files = DATA_DIR.glob(f"*{mode}.txt")
+        criteria_files = CHIA_PATH.glob(f"*{mode}.txt")
 
         for f in criteria_files:
-            clinical_trial_no = str(f).lstrip("data/").rstrip(f"{mode}.txt")
+            clinical_trial_no = str(f).lstrip(f"{CHIA_PATH}/").rstrip(f"{mode}.txt")
 
             with open(f, "rt") as f:
                 criteria = " ".join(f.read().splitlines())
 
-            _rec = {"ct_no": clinical_trial_no, "criteria": criteria,
-                    "mode": "inclusion" if mode == "_inc" else "exclusion"}
+            _rec = {
+                "ct_no": clinical_trial_no,
+                "criteria": criteria,
+                "mode": "inclusion" if mode == "_inc" else "exclusion",
+            }
 
             for entity in ent_map:
                 ents = get_entities(clinical_trial_no, mode, ent_map[entity])
@@ -80,9 +79,8 @@ def load_fb() -> pd.DataFrame:
     Returns:
         pd.DataFrame: FB annotated dataset as a Pandas dataframe
     """
-    input_file = DATA_DIR / "fb_dset_preprocessed.json"
 
-    with open(input_file) as f:
+    with open(FB_PATH) as f:
         _data = json.load(f)
 
     df = pd.json_normalize(_data)
@@ -113,7 +111,7 @@ def train_test_dev_split(df: pd.DataFrame, random_seed=42, ratio=(70, 20, 10)) -
     dev_size = int(len(df) * dev_ratio / 100)
 
     train = df[:train_size]
-    test = df[train_size:train_size+test_size]
-    dev = df[train_size+test_size:]
+    test = df[train_size : train_size + test_size]
+    dev = df[train_size + test_size :]
 
     return {"train": train, "test": test, "dev": dev}
