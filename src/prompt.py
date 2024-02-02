@@ -25,7 +25,7 @@ def few_shot_entity_recognition(
 
     Args:
         examples (List[Dict]): List of few-shot examples
-        criterion (str): Elligibility criterion
+        criterion (str): Eligibility criterion
         entity (str): Entity type
     Returns:
         List[str]: List of predicted entities
