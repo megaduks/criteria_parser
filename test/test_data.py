@@ -22,17 +22,22 @@ class DataTestCase(unittest.TestCase):
         """Tests if load_chia returns a dataframe with 12 columns"""
         self.assertEqual(self.df_chia.shape[1], 12)
 
-    def test_fb_returns_dataframe(self):
-        """Tests if load_fb returns a Pandas dataframe"""
-        self.assertIsInstance(self.df_fb, pd.DataFrame)
+    def test_fb_returns_dict(self):
+        """Tests if load_fb returns a dictionary"""
+        self.assertIsInstance(self.df_fb, dict)
 
-    def test_fb_number_of_rows(self):
-        """Tests if load_fb returns a dataframe with 49903 rows"""
-        self.assertEqual(self.df_fb.shape[0], 49903)
+    def test_fb_keys(self):
+        """Tests if load_fb returns a dictionary with 3 keys"""
+        self.assertEqual(len(self.df_fb), 3)
+        self.assertIn("train", self.df_fb)
+        self.assertIn("test", self.df_fb)
+        self.assertIn("dev", self.df_fb)
 
-    def test_fb_number_of_columns(self):
-        """Tests if load_fb returns a dataframe with 17 columns"""
-        self.assertEqual(self.df_fb.shape[1], 17)
+    def test_fb_num_rows(self):
+        """Tests if load_fb returns a dictionary with 3 dataframes of correct sizes"""
+        self.assertEqual(self.df_fb["train"].shape[0], 70)
+        self.assertEqual(self.df_fb["test"].shape[0], 20)
+        self.assertEqual(self.df_fb["dev"].shape[0], 10)
 
     def test_train_test_dev_split(self):
         """Tests if train_test_dev_split returns a dictionary with 3 keys"""
