@@ -48,7 +48,7 @@ def get_chia_annotations(entity: str, n: int = None, random: bool = False) -> Li
         "scopes",
         "observations",
         "measurements",
-        ]
+    ]
 
     assert entity in ents, f"Entity must be one of {ents}"
 
@@ -139,30 +139,30 @@ def load_fb() -> Dict:
     return d
 
 
-def train_test_dev_split(df: pd.DataFrame, random_seed=42, ratio=(70, 20, 10)) -> Dict:
-    """Splits the dataset into train, test and dev sets using the given ratios and random seed
+def train_test_val_split(df: pd.DataFrame, random_seed=42, ratio=(70, 20, 10)) -> Dict:
+    """Splits the dataset into train, test and validation sets using the given ratios and random seed
 
     Args:
         df (pd.DataFrame): Input dataframe
         random_seed (int, optional): Random seed. Defaults to 42.
-        ratio (tuple, optional): Train, test and dev ratios. Defaults to (70, 20, 10).
+        ratio (tuple, optional): Train, test and val ratios. Defaults to (70, 20, 10).
 
     Returns:
-        Dict: Dictionary with train, test and dev sets
+        Dict: Dictionary with train, test and val sets
     """
 
     assert sum(ratio) == 100, "Sum of ratios must be 100"
 
     df = df.sample(frac=1, random_state=random_seed).reset_index(drop=True)
 
-    train_ratio, test_ratio, dev_ratio = ratio
+    train_ratio, test_ratio, val_ratio = ratio
 
     train_size = int(len(df) * train_ratio / 100)
     test_size = int(len(df) * test_ratio / 100)
-    dev_size = int(len(df) * dev_ratio / 100)
+    val_size = int(len(df) * val_ratio / 100)
 
     train = df[:train_size]
-    test = df[train_size : train_size + test_size]
-    dev = df[train_size + test_size :]
+    test = df[train_size: train_size + test_size]
+    val = df[train_size + test_size:]
 
-    return {"train": train, "test": test, "dev": dev}
+    return {"train": train, "test": test, "val": val}
