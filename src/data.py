@@ -134,7 +134,7 @@ def load_fb() -> Dict:
     for k, v in files.items():
         with open(f"{FB_PATH}/{v}", "rt") as f:
             _data = json.load(f)
-            d["v"] = pd.json_normalize(_data)
+            d[k] = pd.json_normalize(_data)
 
     return d
 
