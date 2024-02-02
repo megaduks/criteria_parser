@@ -2,6 +2,7 @@ import fire
 import pandas as pd
 
 from src.data import load_chia
+from src.prompt import few_shot_entity_recognition
 
 
 def process_chia(n: int = None, random: bool = False):
@@ -14,9 +15,18 @@ def process_chia(n: int = None, random: bool = False):
     df = load_chia()
 
     if random:
-        print(df.sample(frac=1.0)[:n])
+        for _, row in df.sample(frac=1.)[:n].iterrows():
+            print(row["criteria"])
+            print("TRUE: ", row["drugs"], row["persons"], row["conditions"])
+            print("PREDICTED: ", few_shot_entity_recognition(row["criteria"]))
+            print("-" * 100)
     else:
-        print(df[:n])
+        # iterate over rows of the dataframe
+        for _, row in df[:n].iterrows():
+            print(row["criteria"])
+            print(row["drugs"], row["persons"], row["conditions"])
+            print(few_shot_entity_recognition(row["criteria"]))
+            print("-" * 100)
 
 
 if __name__ == "__main__":
