@@ -116,19 +116,27 @@ def load_chia() -> pd.DataFrame:
     return pd.DataFrame(_lst)
 
 
-def load_fb() -> pd.DataFrame:
-    """Exports FB annotated dataset as a Pandas dataframe
+def load_fb() -> Dict:
+    """Exports FB annotated dataset as a dictionary with train, test and val dataframes
 
     Returns:
-        pd.DataFrame: FB annotated dataset as a Pandas dataframe
+        Dict: Dictionary with train, test and val dataframes
     """
 
-    with open(FB_PATH) as f:
-        _data = json.load(f)
+    files = {
+        "train": "fb_dset_100trials_train.json",
+        "test": "fb_dset_100trials_test.json",
+        "val": "fb_dset_100trials_val.json",
+    }
 
-    df = pd.json_normalize(_data)
+    d = {}
 
-    return df
+    for k, v in files.items():
+        with open(f"{FB_PATH}/{v}", "rt") as f:
+            _data = json.load(f)
+            d["v"] = pd.json_normalize(_data)
+
+    return d
 
 
 def train_test_dev_split(df: pd.DataFrame, random_seed=42, ratio=(70, 20, 10)) -> Dict:
