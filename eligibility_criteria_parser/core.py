@@ -14,149 +14,139 @@ from typing import List, Tuple, Callable, Dict
 from tqdm.notebook import tqdm
 
 # %% ../nbs/00_core.ipynb 5
-def load_chia() -> pd.DataFrame:
-    """Exports Chia annotated dataset as a Pandas dataframe"""
-    
-    _lst = []
-    
-    ent_map = {
-        "drugs": "Drug", 
-        "persons": "Person", 
-        "procedures": "Proceure", 
-        "conditions": "Condition",
-        "devices": "Device",
-        "visits": "Visit",
-        "scopes": "Scope",
-        "observations": "Observation",
-        "measurements": "Measurement",
-    }
-    
-    for mode in ["_inc", "_exc"]:
-        
-        criteria_files = Path("data").glob(f"*{mode}.txt")
-
-        for f in criteria_files:
-            clinical_trial_no = str(f).lstrip("data/").rstrip(f"{mode}.txt")
-
-            with open(f, "rt") as f:
-                criteria = " ".join(f.read().splitlines())
-                
-            _rec = {}
-
-            _rec["ct_no"] = clinical_trial_no
-            _rec["criteria"] = criteria
-            _rec["mode"] = "inclusion" if mode == "_inc" else "exclusion"
-
-            for e in ent_map:
-                ents = extract_entities(clinical_trial_no, mode, ent_map[e])
-                _rec[e] = ents if ents else None
-
-            _lst.append(_rec)
-        
-    return pd.DataFrame(_lst)
+# def load_chia() -> pd.DataFrame:
+#     """Exports Chia annotated dataset as a Pandas dataframe"""
+#
+#     _lst = []
+#
+#     ent_map = {
+#         "drugs": "Drug",
+#         "persons": "Person",
+#         "procedures": "Proceure",
+#         "conditions": "Condition",
+#         "devices": "Device",
+#         "visits": "Visit",
+#         "scopes": "Scope",
+#         "observations": "Observation",
+#         "measurements": "Measurement",
+#     }
+#
+#     for mode in ["_inc", "_exc"]:
+#
+#         criteria_files = Path("data").glob(f"*{mode}.txt")
+#
+#         for f in criteria_files:
+#             clinical_trial_no = str(f).lstrip("data/").rstrip(f"{mode}.txt")
+#
+#             with open(f, "rt") as f:
+#                 criteria = " ".join(f.read().splitlines())
+#
+#             _rec = {}
+#
+#             _rec["ct_no"] = clinical_trial_no
+#             _rec["criteria"] = criteria
+#             _rec["mode"] = "inclusion" if mode == "_inc" else "exclusion"
+#
+#             for e in ent_map:
+#                 ents = extract_entities(clinical_trial_no, mode, ent_map[e])
+#                 _rec[e] = ents if ents else None
+#
+#             _lst.append(_rec)
+#
+#     return pd.DataFrame(_lst)
 
 # %% ../nbs/00_core.ipynb 6
-def extract_entities(ct: str, mode: str, e: str) -> List:
-    entities = []
-    
-    with open(f"data/{ct}{mode}.ann", "rt") as f:
-        data = f.read().splitlines()
-        
-    for row in data:
-        if e in row:
-            entities.append(" ".join(row.split()[4:]))
 
-    return entities
 
 # %% ../nbs/00_core.ipynb 8
 from typing import Set
 
-def jaccard_score(a: Set, b: Set, mode: str="strict") -> float:
-    """Computes different versions of the Jaccard score depending on the requested mode
-    
-    strict: |a & b| / |a + b|
-    relaxed: |a & b| / min{|a|,|b|}
-    left: |a & b| / |a|
-    right: |a & b| / |b|
-    """
-    
-    if (not a) or (not b):
-        return 0.
-    
-    if mode == "strict":
-        return len(a.intersection(b)) / len(a.union(b))
-    elif mode == "relaxed":
-        return len(a.intersection(b)) / min(len(a), len(b))
-    elif mode == "left":
-        return len(a.intersection(b)) / len(a)
-    elif mode == "right":
-        return len(a.intersection(b)) / len(b)
+# def jaccard_score(a: Set, b: Set, mode: str="strict") -> float:
+#     """Computes different versions of the Jaccard score depending on the requested mode
+#
+#     strict: |a & b| / |a + b|
+#     relaxed: |a & b| / min{|a|,|b|}
+#     left: |a & b| / |a|
+#     right: |a & b| / |b|
+#     """
+#
+#     if (not a) or (not b):
+#         return 0.
+#
+#     if mode == "strict":
+#         return len(a.intersection(b)) / len(a.union(b))
+#     elif mode == "relaxed":
+#         return len(a.intersection(b)) / min(len(a), len(b))
+#     elif mode == "left":
+#         return len(a.intersection(b)) / len(a)
+#     elif mode == "right":
+#         return len(a.intersection(b)) / len(b)
 
 # %% ../nbs/00_core.ipynb 10
-from typing import List, Tuple
-
-def entity_coverage_score(
-    ents_true: List[str], 
-    ents_pred: List[str], 
-    mode: str, 
-    threshold: float=0.) -> Tuple[float, float]:
-    """Compute the compound metric of entity coverage in eligibility criteria
-    
-    Args:
-        ents_true: entities from Chia annotations
-        ents_pred: predicted entities
-        mode: which version of Jaccard coefficient to use
-        threshold: only matches with Jaccard coefficient above the threshold will count as non-zero
-    
-    
-    For each entity in a criterion, find the predicted entity which maximizes the Jaccard score and
-    return the average Jaccard score for matched entities and the percentage of entites for which
-    any matching has been found
-    """
-    
-    if not ents_true:
-        ents_true = [] # make sure that ents_true is iterable
-    
-    if not ents_pred:
-        return (0., 0.) # max() cannot operate on empty sequence
-
-    scores = [
-        max([jaccard_score(set(e_true.split()), set(e_pred.split()), mode=mode) for e_pred in ents_pred])
-        for e_true
-        in ents_true
-    ]
-    non_zero_scores = [s for s in scores if s > threshold]
-    
-    if not non_zero_scores:
-        return (0., 0.)
-        
-    return (
-        sum(non_zero_scores) / len(non_zero_scores), # average Jaccard score of matched entities
-        len(non_zero_scores) / len(scores), # percentage of matched entities
-    )
+# from typing import List, Tuple
+#
+# def entity_coverage_score(
+#     ents_true: List[str],
+#     ents_pred: List[str],
+#     mode: str,
+#     threshold: float=0.) -> Tuple[float, float]:
+#     """Compute the compound metric of entity coverage in eligibility criteria
+#
+#     Args:
+#         ents_true: entities from Chia annotations
+#         ents_pred: predicted entities
+#         mode: which version of Jaccard coefficient to use
+#         threshold: only matches with Jaccard coefficient above the thresho, 5, 5, 5, 5ld will count as non-zero
+#
+#
+#     For each entity in a criterion, find the predicted entity which maximizes the Jaccard score and
+#     return the average Jaccard score for matched entities and the percentage of entites for which
+#     any matching has been found
+#     """
+#
+#     if not ents_true:
+#         ents_true = [] # make sure that ents_true is iterable
+#
+#     if not ents_pred:
+#         return (0., 0.) # max() cannot operate on empty sequence
+#
+#     scores = [
+#         max([jaccard_score(set(e_true.split()), set(e_pred.split()), mode=mode) for e_pred in ents_pred])
+#         for e_true
+#         in ents_true
+#     ]
+#     non_zero_scores = [s for s in scores if s > threshold]
+#
+#     if not non_zero_scores:
+#         return (0., 0.)
+#
+#     return (
+#         sum(non_zero_scores) / len(non_zero_scores), # average Jaccard score of matched entities
+#         len(non_zero_scores) / len(scores), # percentage of matched entities
+#     )
         
 
 # %% ../nbs/00_core.ipynb 12
-def get_annotations(
-    entity: str, n: int = None, random: bool = False
-) -> List[Tuple[int, str, str]]:
-    df = load_chia()
-
-    if random:
-        result = (
-            df[~df[entity].isna()][["ct_no", "criteria", entity]][:n]
-            .sample(frac=1.0)
-            .to_records(index=False)
-            .tolist()
-        )
-    else:
-        result = (
-            df[~df[entity].isna()][["ct_no", "criteria", entity]][:n]
-            .to_records(index=False)
-            .tolist()
-        )
-
-    return result
+# def get_annotations(
+#     entity: str, n: int = None, random: bool = False
+# ) -> List[Tuple[int, str, str]]:
+#     df = load_chia()
+#
+#     if random:
+#         result = (
+#             df[~df[entity].isna()][["ct_no", "criteria", entity]][:n]
+#             .sample(frac=1.0)
+#             .to_records(index=False)
+#             .tolist()
+#         )
+#     else:
+#         result = (
+#             df[~df[entity].isna()][["ct_no", "criteria", entity]][:n]
+#             .to_records(index=False)
+#             .tolist()
+#         )
+#
+#     return result
 
 # %% ../nbs/00_core.ipynb 14
 def biogpt_prompt_ner(prompt: str, entity: str, model: object) -> List[str]:
