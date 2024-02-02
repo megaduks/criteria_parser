@@ -31,13 +31,13 @@ class DataTestCase(unittest.TestCase):
         self.assertEqual(len(self.df_fb), 3)
         self.assertIn("train", self.df_fb)
         self.assertIn("test", self.df_fb)
-        self.assertIn("dev", self.df_fb)
+        self.assertIn("val", self.df_fb)
 
     def test_fb_num_rows(self):
         """Tests if load_fb returns a dictionary with 3 dataframes of correct sizes"""
-        self.assertEqual(self.df_fb["train"].shape[0], 70)
-        self.assertEqual(self.df_fb["test"].shape[0], 20)
-        self.assertEqual(self.df_fb["dev"].shape[0], 10)
+        self.assertEqual(self.df_fb["train"].shape[0], 1243)
+        self.assertEqual(self.df_fb["test"].shape[0], 10116)
+        self.assertEqual(self.df_fb["val"].shape[0], 376)
 
     def test_train_test_dev_split(self):
         """Tests if train_test_dev_split returns a dictionary with 3 keys"""
