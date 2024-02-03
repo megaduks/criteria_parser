@@ -1,5 +1,5 @@
 import unittest
-from src.metrics import jaccard_score, entity_coverage_score
+from src.metrics import jaccard_score, entity_coverage_score, entity_match_score
 
 
 class MetricsTestCase(unittest.TestCase):
@@ -106,7 +106,8 @@ class MetricsTestCase(unittest.TestCase):
     def test_entity_coverage_score_partial_matching_with_unmatched_entities(self):
         """Tests if entity_coverage_score returns correct value for partial matching entities"""
         self.assertEqual(
-            entity_coverage_score(["a b c d", "e f g h", "i j k", "l m n"], ["a b"]), 0.125
+            entity_coverage_score(["a b c d", "e f g h", "i j k", "l m n"], ["a b"]),
+            0.125,
         )
 
     def test_entity_coverage_score_left_argument_is_not_a_list(self):
@@ -118,6 +119,38 @@ class MetricsTestCase(unittest.TestCase):
         """Tests if entity_coverage_score raises TypeError when right argument is not a list"""
         with self.assertRaises(TypeError):
             entity_coverage_score(["a b c d"], "a b")
+
+    def test_entity_match_emplty_lists(self):
+        """Tests if entity_match_score returns 0. for empty lists"""
+        self.assertEqual(entity_match_score([], []), 0.0)
+
+    def test_entity_match_equal_lists(self):
+        """Tests if entity_match_score returns 1. for equal lists"""
+        self.assertEqual(
+            entity_match_score(
+                [["a", "b c"], ["d", "e f"]], [["a", "b c"], ["d", "e f"]]
+            ),
+            1.0,
+        )
+
+    def test_entity_match_one_prediction_empty(self):
+        """Tests if entity_match_score returns 0. for one empty list"""
+        self.assertEqual(entity_match_score([["a", "b c"], ["d", "e f"]], []), 0.0)
+
+    def test_entity_match_partial_matching_entities(self):
+        """Tests if entity_match_score returns correct value for partial matching entities"""
+        self.assertEqual(
+            entity_match_score([["a b c d", "e f g h"], ["i j k", "l m n"]], ["a b", "e f"]),
+            0.0,
+        )
+
+    def test_entity_match_ents_predicted_with_none(self):
+        """Tests if entity_match_score returns 0. for one empty list"""
+        self.assertEqual(entity_match_score([["a", "b c"], ["d", "e f"]], ['None']), 0.0)
+
+    def test_entity_match_ents_true_empty_ents_predicted_with_none(self):
+        """Tests if entity_match_score returns 0. for one empty list"""
+        self.assertEqual(entity_match_score([], ["None"]), 0.0)
 
 
 if __name__ == "__main__":
