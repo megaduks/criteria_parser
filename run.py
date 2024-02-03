@@ -4,6 +4,7 @@ import pickle
 from pathlib import Path
 from src.data import load_chia, load_fb
 from src.prompt import few_shot_entity_recognition
+from tqdm import tqdm
 
 
 def process_chia(n: int = None, random: bool = False):
@@ -48,14 +49,14 @@ def ner_fb(entity: str, n: int = None, random: bool = False, verbose: bool = Fal
         few_shot_examples = json.load(f)[entity]
 
     if random:
-        for _, row in df.sample(frac=1.)[:n].iterrows():
+        for _, row in tqdm(df.sample(frac=1.)[:n].iterrows()):
             criterion = row["criterion"]
             ent_true = row[entity]
             ent_pred = few_shot_entity_recognition(few_shot_examples, criterion, entity)
 
             results.append((entity, criterion, ent_true, ent_pred))
     else:
-        for _, row in df[:n].iterrows():
+        for _, row in tqdm(df[:n].iterrows()):
             criterion = row["criterion"]
             ent_true = row[entity]
             ent_pred = few_shot_entity_recognition(few_shot_examples, criterion, entity)
