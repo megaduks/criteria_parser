@@ -42,7 +42,7 @@ def few_shot_entity_recognition(
         examples=examples,
         example_prompt=example_prompt,
         prefix=f"""Find examples of {entity} in the following criterion. {format_instructions}
-        If no examples are found, type 'None'.""",
+        If no examples are found, type 'None'. Return only the entities found in the criterion. \n""",
         suffix="criterion: {criterion} \n entities:",
         input_variables=["criterion"],
     )
