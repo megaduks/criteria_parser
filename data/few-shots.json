@@ -1,0 +1,120 @@
+{
+  "feature": [
+        {
+            "criterion": "diagnosis of cancer with chemotherapy or radiation treatment during the previous 5 years",
+            "entities": "chemotherapy, radiation treatment"
+        },
+        {
+            "criterion": "Prior androgen deprivation therapy and\/or first generation anti-androgen (e.g. bicalutamide, nilutamide, flutamide) for biochemically recurrent prostate cancer",
+            "entities": "flutamide, nilutamide, bicalutamide, Prior androgen deprivation therapy"
+        },
+        {
+            "criterion": "Patients must not have a systemic bacterial, fungal, or viral infection that is not controlled (defined as exhibiting ongoing signs\/symptoms related to the infection and without improvement despite appropriate antibiotics or other treatment)",
+            "entities": "treatment, antibiotics"
+        },
+        {
+            "criterion": "Anticoagulants or antiplatelet agents except for low-dose, 81 mg aspirin",
+            "entities": "Anticoagulants, antiplatelet agents, aspirin"
+        },
+        {
+            "criterion": "Evidence of active malignant disease",
+            "entities": ""
+        },
+        {
+            "criterion": "No history of ulcer disease or GI bleeding",
+            "entities": ""
+        }
+    ],
+  "chronic_disease": [
+        {
+            "criterion": "Other medical or psychiatric disorder placing the subject at undue risk for treatment complications",
+            "entities": "psychiatric disorder, medical"
+        },
+        {
+            "criterion": "Exclude subjects with liver dysfunction, kidney dysfunction and glaucoma (per the risks associated with topiramate)",
+            "entities": "liver dysfunction, glaucoma, kidney dysfunction"
+        },
+        {
+            "criterion": "loop recorder explanted within the past 12 months",
+            "entities": ""
+        },
+        {
+            "criterion": "have a systolic blood pressure of < 150 mmHg and a diastolic blood pressure of < 90 mmHg at rest",
+            "entities": ""
+        },
+        {
+            "criterion": "Have a primary clinical problem in the areas of anxiety, depression, conduct, or posttraumatic stress",
+            "entities": "depression, anxiety, posttraumatic stress"
+        }
+    ],
+    "clinical_variable": [
+        {
+            "criterion": "Abnormal serum sodium, potassium, calcium, magnesium, phosphate at grade III or IV by the Common Terminology Criteria for Adverse Events (CTCAE) version 4.0",
+            "entities": "Common Terminology Criteria for Adverse Events (CTCAE) version 4.0"
+        },
+        {
+            "criterion": "Have an ALT or AST > 5.0 x the upper limit of normal",
+            "entities": "ALT, AST"
+        },
+        {
+            "criterion": "Adequate liver function defined as total bilirubin ≤ 1.5 x upper limit of normal (ULN) for age",
+            "entities": "total bilirubin"
+        },
+        {
+            "criterion": "Evidence of clinically significant alcohol withdrawal symptoms defined as a CIWA-Ar score of ≥ 10",
+            "entities": "CIWA-Ar score"
+        },
+        {
+            "criterion": "Participants must have histologically confirmed operable triple negative breast cancer",
+            "entities": ""
+        },
+        {
+            "criterion": "Other medical or psychiatric disorder placing the subject at undue risk for treatment complications",
+            "entities": ""
+        }
+    ],
+    "allergy_name": [
+        {
+            "criterion": "Known allergies or hypersensitivities to Linagliptin or Dipeptidyl peptidase-4 (DDP-4) inhibitors",
+            "entities": "Dipeptidyl peptidase-4 (DDP-4) inhibitors, Linagliptin"
+        },
+        {
+            "criterion": "Allergy to propofol, soybean oil, egg lecithin or glycerol",
+            "entities": "propofol, glycerol, soybean oil, egg lecithin"
+        },
+        {
+            "criterion": "MRI contraindications (e.g., foreign metallic implants, pacemaker)",
+            "entities": "pacemaker, foreign metallic implants, MRI"
+        },
+        {
+            "criterion": "Participants must have histologically confirmed operable triple negative breast cancer",
+            "entities": ""
+        },
+        {
+            "criterion": "Other medical or psychiatric disorder placing the subject at undue risk for treatment complications",
+            "entities": ""
+        }
+    ],
+    "cancer": [
+        {
+            "criterion": "Participant has received no prior radiotherapy or chemotherapy for rhabdomyosarcoma (excluding steroids) unless an emergency situation requires local tumor treatment",
+            "entities": "tumor"
+        },
+        {
+            "criterion": "Aspartate aminotransferase (AST) (serum glutamic oxaloacetic transaminase [SGOT]) and alanine aminotransferase (ALT) (serum glutamate pyruvate transaminase [SGPT]) =< 2.5 x ULN (or =< 5 x ULN if liver metastases [mets])",
+            "entities": "liver metastases [mets])"
+        },
+        {
+            "criterion": "Patients must have histologically confirmed, BRAF-mutant (V600E/K) melanoma (molecularly confirmed using validated, commercially available assay performed in a Clinical Laboratory Improvement Act [CLIA]-approved laboratory) that is metastatic or unresectable and for which standard curative measures do not exist or are no longer effective",
+            "entities": "melanoma"
+        },
+        {
+            "criterion": "loop recorder explanted within the past 12 months",
+            "entities": ""
+        },
+        {
+            "criterion": "Other medical or psychiatric disorder placing the subject at undue risk for treatment complications",
+            "entities": ""
+        }
+    ]
+}
