@@ -20,7 +20,7 @@ def jaccard_score(a: Set, b: Set, mode: str = "strict") -> float:
     """
 
     if (not a) or (not b):
-        return 0.
+        return 0.0
 
     if mode == "strict":
         return len(a.intersection(b)) / len(a.union(b))
@@ -33,9 +33,9 @@ def jaccard_score(a: Set, b: Set, mode: str = "strict") -> float:
 
 
 def entity_coverage_score(
-        ents_true: List[str],
-        ents_pred: List[str],
-        jaccard_mode: str = "strict",
+    ents_true: List[str],
+    ents_pred: List[str],
+    jaccard_mode: str = "strict",
 ) -> float:
     """Computes the entity coverage score for a given mode. Given a list of true entities and the list of
     predicted entities, the entity coverage score is the average Jaccard score of the predicted entities when
@@ -55,15 +55,56 @@ def entity_coverage_score(
         raise TypeError("Entities must be a list")
 
     if not ents_true:
-        return 0.
+        return 0.0
 
     if not ents_pred:
-        return 0.
+        return 0.0
 
     # split each ent_pred and find maximum jaccard score among ents_true
     scores = [
-        max([jaccard_score(set(e_true.split()), set(e_pred.split()), mode=jaccard_mode) for e_pred in ents_pred])
-        for e_true
-        in ents_true
+        max(
+            [
+                jaccard_score(
+                    set(e_true.split()), set(e_pred.split()), mode=jaccard_mode
+                )
+                for e_pred in ents_pred
+            ]
+        )
+        for e_true in ents_true
     ]
     return np.mean(scores)
+
+
+def entity_match_score(ents_true: List[List[str]], ents_pred: List[List[str]]) -> float:
+    """Computes the entity match score for a given mode. Given a list of true entities and the list of
+    predicted entities, the entity match score performs a pairwise comparison of the entities and returns 1 if
+    there is a match and 0 otherwise.
+
+    Args:
+        ents_true (List[List[str]]): List of entities in the ground truth
+        ents_pred (List[List[str]]): List of entities in the prediction
+
+    Returns:
+        float: Percentage of true entities that have a match in the predicted entities
+    """
+
+    if not ents_true:
+        return 0.0
+
+    if not ents_pred:
+        return 0.0
+
+    # transform ents_pred by changing every ['None'] to []
+    ents_pred = [e if e != ["None"] else [] for e in ents_pred]
+
+    # transform each list of entities into a set
+    ents_true = [set(e) for e in ents_true]
+    ents_pred = [set(e) for e in ents_pred]
+
+    # make a pairwise comparison resulting in 1 if sets match, 0 otherwise
+    matches = [
+        1 if e_true == e_pred else 0 for e_true, e_pred in zip(ents_true, ents_pred)
+    ]
+
+    # return the percentage of matches
+    return np.mean(matches)
