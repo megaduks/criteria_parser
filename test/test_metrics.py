@@ -203,6 +203,10 @@ class MetricsTestCase(unittest.TestCase):
         """Tests if str_to_BIO_entities returns the correct BIO entities for an entity with wrong order"""
         self.assertEqual(str_to_BIO_entities("a b c d", "ENT", ["c b"]), ["O", "O", "O", "O"])
 
+    def test_str_to_BIO_entity_with_punctuation(self):
+        """Tests if str_to_BIO_entities returns the correct BIO entities for an entity with punctuation"""
+        self.assertEqual(str_to_BIO_entities("a b c, d.", "ENT", ["b c"]), ["O", "B-ENT", "I-ENT", "O", "O", "O"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -30,6 +30,9 @@ def str_to_BIO_entities(text: str, ent_name: str, entities: List[str]) -> List[s
     Returns:
         List[str]: List of BIO entities
     """
+
+    text = text.replace(".", " .").replace(",", " ,").replace("!", " !").replace("?", " ?")
+
     # create a list of 'O' entities
     bio_entities = ["O"] * len(text.split())
 
