@@ -140,13 +140,17 @@ class MetricsTestCase(unittest.TestCase):
     def test_entity_match_partial_matching_entities(self):
         """Tests if entity_match_score returns correct value for partial matching entities"""
         self.assertEqual(
-            entity_match_score([["a b c d", "e f g h"], ["i j k", "l m n"]], ["a b", "e f"]),
+            entity_match_score(
+                [["a b c d", "e f g h"], ["i j k", "l m n"]], ["a b", "e f"]
+            ),
             0.0,
         )
 
     def test_entity_match_ents_predicted_with_none(self):
         """Tests if entity_match_score returns 0. for one empty list"""
-        self.assertEqual(entity_match_score([["a", "b c"], ["d", "e f"]], ['None']), 0.0)
+        self.assertEqual(
+            entity_match_score([["a", "b c"], ["d", "e f"]], ["None"]), 0.0
+        )
 
     def test_entity_match_ents_true_empty_ents_predicted_with_none(self):
         """Tests if entity_match_score returns 0. for one empty list"""
@@ -171,6 +175,25 @@ class MetricsTestCase(unittest.TestCase):
     def test_llm_none_cleaner_two_Nones(self):
         """Tests if llm_none_cleaner returns the original list for a list containing two 'None's"""
         self.assertEqual(llm_none_cleaner(["None", "None"]), ["None", "None"])
+
+    def test_str_to_BIO_entities_simple_entity(self):
+        """Tests if str_to_BIO_entities returns the correct BIO entities for a simple entity"""
+        self.assertEqual(str_to_BIO_entities("a b c d", ["b"]), ["O", "B", "O", "O"])
+
+    def test_str_to_BIO_multi_token_entity(self):
+        """Tests if str_to_BIO_entities returns the correct BIO entities for a multi-token entity"""
+        self.assertEqual(str_to_BIO_entities("a b c d", ["b c"]), ["O", "B", "I", "O"])
+
+    def test_str_to_BIO_empty_entities(self):
+        """Tests if str_to_BIO_entities returns the correct BIO entities for an empty list of entities"""
+        self.assertEqual(str_to_BIO_entities("a b c d", []), ["O", "O", "O", "O"])
+
+    def test_str_to_BIO_multiple_multi_token_entities(self):
+        """Tests if str_to_BIO_entities returns the correct BIO entities for multiple multi-token entities"""
+        self.assertEqual(
+            str_to_BIO_entities("a b c d e f g h", ["b c", "e f"]),
+            ["O", "B", "I", "O", "B", "I", "O", "O"],
+        )
 
 
 if __name__ == "__main__":
