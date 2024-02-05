@@ -20,6 +20,33 @@ def llm_none_cleaner(output: List[str]) -> List[str]:
         return output
 
 
+def str_to_BIO_entities(text: str, entities: List[str]) -> List[str]:
+    """Converts a list of entities into a list of BIO entities
+
+    Args:
+        text (str): Text
+        entities (List[str]): List of entities
+    Returns:
+        List[str]: List of BIO entities
+    """
+    # create a list of 'O' entities
+    bio_entities = ["O"] * len(text.split())
+
+    # for each entity, split it and find the index of the first word
+    for entity in entities:
+        entity = entity.split()
+        start = text.split().index(entity[0])
+
+        # mark the first word as 'B'
+        bio_entities[start] = "B"
+
+        # mark the rest of the words as 'I'
+        for i in range(start + 1, start + len(entity)):
+            bio_entities[i] = "I"
+
+    return bio_entities
+
+
 def jaccard_score(a: Set, b: Set, mode: str = "strict") -> float:
     """Computes different versions of the Jaccard score depending on the requested mode
 
