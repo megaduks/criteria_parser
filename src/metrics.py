@@ -55,7 +55,6 @@ def str_to_BIO_entities(text: str, ent_name: str, entities: List[str]) -> List[s
 
     # for each entity, split it and find the index of the first word
     for entity in entities:
-        print(f"text: {text} \n entity: {entity}")
 
         # if entity is not in text, skip
         if entity not in text:
