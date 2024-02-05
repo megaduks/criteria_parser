@@ -2,6 +2,24 @@ from typing import Set, List
 import numpy as np
 
 
+def llm_none_cleaner(output: List[str]) -> List[str]:
+    """Reads the output returned by the LLM and returns a cleaned version of the output
+    by changing all instances of lists containing 'None' to an empty list.
+
+    Args:
+        output (List): Output returned by the LLM
+    Returns:
+        List: Empty list if the output contains only 'None', otherwise the original output
+    """
+    none_strings = ["None", "none", "NONE", "None.", "none.", "NONE."]
+
+    # if the only string contained in the output is one of the none_strings, return an empty list
+    if len(output) == 1 and output[0] in none_strings:
+        return []
+    else:
+        return output
+
+
 def jaccard_score(a: Set, b: Set, mode: str = "strict") -> float:
     """Computes different versions of the Jaccard score depending on the requested mode
 
