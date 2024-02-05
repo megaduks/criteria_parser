@@ -1,5 +1,5 @@
 import unittest
-from src.metrics import jaccard_score, entity_coverage_score, entity_match_score
+from src.metrics import *
 
 
 class MetricsTestCase(unittest.TestCase):
@@ -151,6 +151,26 @@ class MetricsTestCase(unittest.TestCase):
     def test_entity_match_ents_true_empty_ents_predicted_with_none(self):
         """Tests if entity_match_score returns 0. for one empty list"""
         self.assertEqual(entity_match_score([], ["None"]), 0.0)
+
+    def test_llm_none_cleaner_single_None(self):
+        """Tests if llm_none_cleaner returns an empty list for a list containing a single 'None'"""
+        self.assertEqual(llm_none_cleaner(["None"]), [])
+
+    def test_llm_none_cleaner_nonempty_list(self):
+        """Tests if llm_none_cleaner returns the original list for a nonempty list"""
+        self.assertEqual(llm_none_cleaner(["a", "b", "c"]), ["a", "b", "c"])
+
+    def test_llm_none_cleaner_single_None_with_period(self):
+        """Tests if llm_none_cleaner returns an empty list for a list containing a single 'None' with a period"""
+        self.assertEqual(llm_none_cleaner(["None."]), [])
+
+    def test_llm_none_cleaner_single_none_lowercase(self):
+        """Tests if llm_none_cleaner returns an empty list for a list containing a single 'none'"""
+        self.assertEqual(llm_none_cleaner(["none"]), [])
+
+    def test_llm_none_cleaner_two_Nones(self):
+        """Tests if llm_none_cleaner returns the original list for a list containing two 'None's"""
+        self.assertEqual(llm_none_cleaner(["None", "None"]), ["None", "None"])
 
 
 if __name__ == "__main__":
