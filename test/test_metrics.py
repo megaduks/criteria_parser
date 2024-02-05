@@ -195,6 +195,10 @@ class MetricsTestCase(unittest.TestCase):
             ["O", "B", "I", "O", "B", "I", "O", "O"],
         )
 
+    def test_str_to_BIO_nonexistent_entity(self):
+        """Tests if str_to_BIO_entities returns the correct BIO entities for a nonexistent entity"""
+        self.assertEqual(str_to_BIO_entities("a b c d", ["e"]), ["O", "O", "O", "O"])
+
 
 if __name__ == "__main__":
     unittest.main()
