@@ -20,11 +20,12 @@ def llm_none_cleaner(output: List[str]) -> List[str]:
         return output
 
 
-def str_to_BIO_entities(text: str, entities: List[str]) -> List[str]:
+def str_to_BIO_entities(text: str, ent_name: str, entities: List[str]) -> List[str]:
     """Converts a list of entities into a list of BIO entities
 
     Args:
         text (str): Text
+        ent_name (str): name of the entity
         entities (List[str]): List of entities
     Returns:
         List[str]: List of BIO entities
@@ -34,20 +35,21 @@ def str_to_BIO_entities(text: str, entities: List[str]) -> List[str]:
 
     # for each entity, split it and find the index of the first word
     for entity in entities:
-        entity = entity.split()
 
         # if entity is not in text, skip
-        if entity[0] not in text.split():
+        if entity not in text:
             continue
+
+        entity = entity.split()
 
         start = text.split().index(entity[0])
 
         # mark the first word as 'B'
-        bio_entities[start] = "B"
+        bio_entities[start] = f"B-{ent_name}"
 
         # mark the rest of the words as 'I'
         for i in range(start + 1, start + len(entity)):
-            bio_entities[i] = "I"
+            bio_entities[i] = f"I-{ent_name}"
 
     return bio_entities
 
