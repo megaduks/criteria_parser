@@ -178,34 +178,85 @@ class MetricsTestCase(unittest.TestCase):
 
     def test_str_to_BIO_entities_simple_entity(self):
         """Tests if str_to_BIO_entities returns the correct BIO entities for a simple entity"""
-        self.assertEqual(str_to_BIO_entities("a b c d", "ENT", ["b"]), ["O", "B-ENT", "O", "O"])
+        self.assertEqual(
+            str_to_BIO_entities("a b c d", "ENT", ["b"]), ["O", "B-ENT", "O", "O"]
+        )
 
     def test_str_to_BIO_multi_token_entity(self):
         """Tests if str_to_BIO_entities returns the correct BIO entities for a multi-token entity"""
-        self.assertEqual(str_to_BIO_entities("aaa bbb ccc ddd", "ENT", ["bbb ccc"]), ["O", "B-ENT", "I-ENT", "O"])
+        self.assertEqual(
+            str_to_BIO_entities("aaa bbb ccc ddd", "ENT", ["bbb ccc"]),
+            ["O", "B-ENT", "I-ENT", "O"],
+        )
 
     def test_str_to_BIO_empty_entities(self):
         """Tests if str_to_BIO_entities returns the correct BIO entities for an empty list of entities"""
-        self.assertEqual(str_to_BIO_entities("a b c d", "ENT", []), ["O", "O", "O", "O"])
+        self.assertEqual(
+            str_to_BIO_entities("a b c d", "ENT", []), ["O", "O", "O", "O"]
+        )
 
     def test_str_to_BIO_multiple_multi_token_entities(self):
         """Tests if str_to_BIO_entities returns the correct BIO entities for multiple multi-token entities"""
         self.assertEqual(
-            str_to_BIO_entities("aaa bbb ccc ddd eee fff ggg hhh", "ENT", ["bbb ccc", "eee fff"]),
+            str_to_BIO_entities(
+                "aaa bbb ccc ddd eee fff ggg hhh", "ENT", ["bbb ccc", "eee fff"]
+            ),
             ["O", "B-ENT", "I-ENT", "O", "B-ENT", "I-ENT", "O", "O"],
         )
 
     def test_str_to_BIO_nonexistent_entity(self):
         """Tests if str_to_BIO_entities returns the correct BIO entities for a nonexistent entity"""
-        self.assertEqual(str_to_BIO_entities("a b c d", "ENT", ["e"]), ["O", "O", "O", "O"])
+        self.assertEqual(
+            str_to_BIO_entities("a b c d", "ENT", ["e"]), ["O", "O", "O", "O"]
+        )
 
     def test_str_to_BIO_entity_in_wrong_order_of_tokens(self):
         """Tests if str_to_BIO_entities returns the correct BIO entities for an entity with wrong order"""
-        self.assertEqual(str_to_BIO_entities("a b c d", "ENT", ["c b"]), ["O", "O", "O", "O"])
+        self.assertEqual(
+            str_to_BIO_entities("a b c d", "ENT", ["c b"]), ["O", "O", "O", "O"]
+        )
 
     def test_str_to_BIO_entity_with_punctuation(self):
         """Tests if str_to_BIO_entities returns the correct BIO entities for an entity with punctuation"""
-        self.assertEqual(str_to_BIO_entities("a b c, d.", "ENT", ["b c"]), ["O", "B-ENT", "I-ENT", "O", "O", "O"])
+        self.assertEqual(
+            str_to_BIO_entities("a b c, d.", "ENT", ["b c"]),
+            ["O", "B-ENT", "I-ENT", "O", "O", "O"],
+        )
+
+    def test_merge_BIO_entities_empty(self):
+        """Tests if merge_BIO_entities returns an empty list for an empty list of BIO entities"""
+        self.assertEqual(merge_BIO_entities([]), [])
+
+    def test_merge_BIO_entities_single_O(self):
+        """Tests if merge_BIO_entities returns the original list for a list containing a single 'O'"""
+        self.assertEqual(merge_BIO_entities([["O"]]), ["O"])
+
+    def test_merge_BIO_entities_two_lists_different_entities(self):
+        """Tests if merge_BIO_entities returns the original list for a list containing two different entities"""
+        self.assertEqual(
+            merge_BIO_entities([["B-X", "I-X", "O", "O"], ["O", "O", "B-Y", "I-Y"]]),
+            ["B-X", "I-X", "B-Y", "I-Y"],
+        )
+
+    def test_merge_BIO_entities_two_lists_overlapping_entities(self):
+        """Tests if merge_BIO_entities returns the original list for a list containing two overlapping entities"""
+        self.assertEqual(
+            merge_BIO_entities([["B-X", "I-X", "O", "O"], ["B-Y", "I-Y", "O", "O"]]),
+            ["B-Y", "I-Y", "O", "O"],
+        )
+
+    def test_merge_BIO_entities_three_input_lists(self):
+        """Tests if merge_BIO_entities returns the original list for a list containing three input lists"""
+        self.assertEqual(
+            merge_BIO_entities(
+                [
+                    ["B-X", "I-X", "O", "O"],
+                    ["B-Y", "I-Y", "O", "O"],
+                    ["O", "O", "B-Z", "I-Z"],
+                ]
+            ),
+            ["B-Y", "I-Y", "B-Z", "I-Z"],
+        )
 
 
 if __name__ == "__main__":

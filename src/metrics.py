@@ -31,13 +31,31 @@ def str_to_BIO_entities(text: str, ent_name: str, entities: List[str]) -> List[s
         List[str]: List of BIO entities
     """
 
-    text = text.replace(".", " .").replace(",", " ,").replace("!", " !").replace("?", " ?")
+    text = (
+        text.replace(".", " . ")
+        .replace(",", " , ")
+        .replace("!", " ! ")
+        .replace("?", " ? ")
+        .replace(":", " : ")
+        .replace(";", " ; ")
+        .replace("(", " ( ")
+        .replace(")", " ) ")
+        .replace("[", " [ ")
+        .replace("]", " ] ")
+        .replace("{", " { ")
+        .replace("}", " } ")
+        .replace("-", " - ")
+        .replace("/", " / ")
+        .replace("®", " ® ")
+        .replace("_", " _ ")
+    )
 
     # create a list of 'O' entities
     bio_entities = ["O"] * len(text.split())
 
     # for each entity, split it and find the index of the first word
     for entity in entities:
+        print(f"text: {text} \n entity: {entity}")
 
         # if entity is not in text, skip
         if entity not in text:
@@ -55,6 +73,31 @@ def str_to_BIO_entities(text: str, ent_name: str, entities: List[str]) -> List[s
             bio_entities[i] = f"I-{ent_name}"
 
     return bio_entities
+
+
+def merge_BIO_entities(bio_entities: List[List[str]]) -> List[str]:
+    """Given a list of lists of BIO entities, merge them into a single list of BIO entities
+
+    Args:
+        bio_entities (List[List[str]]): List of lists of BIO entities
+    Returns:
+        List[str]: Merged list of BIO entities
+    """
+
+    # if bio_entities is empty, return an empty list
+    if not bio_entities:
+        return []
+
+    # create a list of 'O' entities
+    merged_bio_entities = ["O"] * len(bio_entities[0])
+
+    # for each list of BIO entities, if the entity is not 'O', mark it as such
+    for entities in bio_entities:
+        for i, entity in enumerate(entities):
+            if entity != "O":
+                merged_bio_entities[i] = entity
+
+    return merged_bio_entities
 
 
 def jaccard_score(a: Set, b: Set, mode: str = "strict") -> float:
