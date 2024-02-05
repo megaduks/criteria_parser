@@ -2,6 +2,103 @@ from typing import Set, List
 import numpy as np
 
 
+def llm_none_cleaner(output: List[str]) -> List[str]:
+    """Reads the output returned by the LLM and returns a cleaned version of the output
+    by changing all instances of lists containing 'None' to an empty list.
+
+    Args:
+        output (List): Output returned by the LLM
+    Returns:
+        List: Empty list if the output contains only 'None', otherwise the original output
+    """
+    none_strings = ["None", "none", "NONE", "None.", "none.", "NONE."]
+
+    # if the only string contained in the output is one of the none_strings, return an empty list
+    if len(output) == 1 and output[0] in none_strings:
+        return []
+    else:
+        return output
+
+
+def str_to_BIO_entities(text: str, ent_name: str, entities: List[str]) -> List[str]:
+    """Converts a list of entities into a list of BIO entities
+
+    Args:
+        text (str): Text
+        ent_name (str): name of the entity
+        entities (List[str]): List of entities
+    Returns:
+        List[str]: List of BIO entities
+    """
+
+    text = (
+        text.replace(".", " . ")
+        .replace(",", " , ")
+        .replace("!", " ! ")
+        .replace("?", " ? ")
+        .replace(":", " : ")
+        .replace(";", " ; ")
+        .replace("(", " ( ")
+        .replace(")", " ) ")
+        .replace("[", " [ ")
+        .replace("]", " ] ")
+        .replace("{", " { ")
+        .replace("}", " } ")
+        .replace("-", " - ")
+        .replace("/", " / ")
+        .replace("®", " ® ")
+        .replace("_", " _ ")
+    )
+
+    # create a list of 'O' entities
+    bio_entities = ["O"] * len(text.split())
+
+    # for each entity, split it and find the index of the first word
+    for entity in entities:
+
+        # if entity is not in text, skip
+        if entity not in text:
+            continue
+
+        entity = entity.split()
+
+        start = text.split().index(entity[0])
+
+        # mark the first word as 'B'
+        bio_entities[start] = f"B-{ent_name}"
+
+        # mark the rest of the words as 'I'
+        for i in range(start + 1, start + len(entity)):
+            bio_entities[i] = f"I-{ent_name}"
+
+    return bio_entities
+
+
+def merge_BIO_entities(bio_entities: List[List[str]]) -> List[str]:
+    """Given a list of lists of BIO entities, merge them into a single list of BIO entities
+
+    Args:
+        bio_entities (List[List[str]]): List of lists of BIO entities
+    Returns:
+        List[str]: Merged list of BIO entities
+    """
+
+    # if bio_entities is empty, return an empty list
+    if not bio_entities:
+        return []
+
+    # create a list of 'O' entities
+    merged_bio_entities = ["O"] * len(bio_entities[0])
+
+    # for each list of BIO entities, if the entity is not 'O', mark it as such
+    for entities in bio_entities:
+        for i, entity in enumerate(entities):
+            if entity != "O":
+                merged_bio_entities[i] = entity
+
+    return merged_bio_entities
+
+
 def jaccard_score(a: Set, b: Set, mode: str = "strict") -> float:
     """Computes different versions of the Jaccard score depending on the requested mode
 
